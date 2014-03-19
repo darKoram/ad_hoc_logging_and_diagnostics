@@ -1,0 +1,12 @@
+---
+# This is the main tasks file.  It must be included if there is a tasks/ directory.
+# Use it to include other tasks if there are any, or just do it all here.
+
+# Hadoop for logging openstack logs
+# http://www.youtube.com/watch?v=_RKbF67YYE4
+
+# This role will eventuall push and configure all the logging requirements of a deploy
+# It also hosts utilities for one-off and add hock tasks to be used in playbooks for
+# diagnostic gathering and troubleshooting sessions.
+
+ - include: zgather_diagnostics.yml

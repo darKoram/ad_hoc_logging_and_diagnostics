@@ -1,0 +1,115 @@
+# openstack_diagnose_ips.yml
+
+# At the bottom of the playbook you will find a tiny fraction of the requests
+# made by Mirantis in the course of diagnosing an issue.
+# The requests were to gather logs or execute commands or scripts across multiple
+# nodes and gather the results to send to them.
+
+# Note that trailing / on folders is important to rsync.  
+# synchronize src=A/B/ dest=C
+# gives C/all_files_in_B
+# synchronize src=A/B/ dest=C
+# gives C/B/all_files_in_B
+
+
+diagnostic_request: {
+    header: {
+       issue: "immunity03",
+       email_from: "kbroughton@example.com",
+       email: "kbroughton@support.mirantis.com,sister@example.com"
+     },
+     requests: [
+       {
+       "hostname": "controller",
+        "paths": [
+         /var/log/remote,
+         /var/log/nova,
+         /var/log/glance,
+         /var/log/keystone,
+         /var/log/keystone-*
+           ],
+       commands: [
+         'lsof -n -p $(pid_of_crmd) | wc -l',
+         'top -n 1 -b',
+         'ip netns list'],
+       scripts: [
+         test_script2.sh
+           ]
+       },
+       {
+       "hostname": "compute",
+       "paths": [
+         /var/log/messages*,
+         /var/log/hdfs
+           ],
+       commands: [
+
+           ],
+       scripts: [
+         test_script.sh
+           ]
+       },
+       {
+       "hostname": "node-8",
+       "paths": [
+           ],
+       commands: [
+         'crm resource status',
+         'quantum agent-list',
+           ],
+       scripts: [
+         test_script.sh
+           ]
+       }
+     ]
+}
+
+
+# Kesten
+# We had previously testing private and public assignment of ips and it was working.
+# As of about a week ago, we noticed that new vms were not being assigned private ips.
+
+# Mirantis
+# Would you please send us outputs of "crm resource status" and "quantum agent-list"? 
+# Could you please execute 'ip netns list' on all controllers and send us output?
+
+# Mirantis
+# Please send a tarball of the fuel controller's /var/log/remote 
+# and the /var/log/{nova,glance,keystone,rabbitmq} as well as
+# /var/log/{glance-all.*,keystone-all.*}
+
+# Miranitis
+# Would you please run the following commands:
+# $: crm resource cleanup p_quantum-dhcp-agent
+# $: crm resource start p_quantum-dhcp-agent
+# Also would you please send us outputs of "crm resource status", "quantum agent-list" from one of your controller 
+# node and "ip netns list" from every controller node after described actions?
+
+# Kesten
+# I have automated scripts to push commands and get results to a cluster simultaneously using ansible.
+# However, ansible needs to see ips to work over ssh.
+# Currently to get to the controllers I have to ssh to root@fuel and then ssh from there to root@node-25 etc.
+
+# Mirantis
+# - run following command from masternode
+# for i in {31,29,32,28,33}; do ssh node-$i “service nova-api restart; service nova-compute restart”; done
+# this command will restart nova api and compute services on the compute nodes
+# Also, could you please execute on each controller:
+# > $ top
+# > $ lsof -n -p $(pid_of_crmd) | wc -l
+# and send us output before the meeting? 
+
+# Mirantis
+# Here's the launchpad bug related to this:
+# https://bugs.launchpad.net/fuel/+bug/1269334
+# I'm attaching the file ovs.patch for your review.
+# You'll note it's a one-character change to the get_worker_pid() function which appears in four different files. The code that determines the pid in that function should read:
+# pid=`pgrep -u ${OCF_RESKEY_user} -fol ${OCF_RESKEY_binary} | grep -E "python\s+\/usr\/bin" | awk '{print $1}'`
+# Here's an example of how to APPLY the patch to 3 nodes 10.x.y.{5,6,7}
+# #!/bin/bash
+# files='/usr/lib/ocf/resource.d/mirantis/quantum-agent-*'
+# for i in '10.x.y.5' '10.x.y.6' '10.x.y.7'
+# do
+# scp ovs.patch $i:~/
+# ssh $i "patch -p0 < ~/ovs.patch; rm -rf ~/ovs.patch"
+# done

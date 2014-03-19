@@ -1,0 +1,36 @@
+# put all scripts in logging/scripts
+diagnostic_request: {
+    header: {
+       issue: "immunity03",
+       email_from: "kbroughton@example.com",
+       email: "kbroughton@example.com,sister@example.com"
+     },
+     requests: [
+       {
+       "hostname": "elasticsearch",
+        "paths": [
+         /var/log/messages,
+         /var/log/elasticsearch
+           ],
+       commands: [
+           ],
+       scripts: [
+         test_script2.sh
+           ]
+       },
+       {
+       "hostname": "hdfs",
+       "paths": [
+         /var/log/messages*,
+         /var/log/hdfs
+           ],
+       commands: [
+         'hostname'
+           ],
+       scripts: [
+         test_script.sh
+           ]
+       }
+     ]
+}
+

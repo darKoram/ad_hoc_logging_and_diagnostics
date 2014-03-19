@@ -1,0 +1,25 @@
+---
+
+# vars/main.yml for {{role_name}}
+# Use this file to gather vars common to all tasks for this role
+
+# vars can also go in playbooks
+# - hosts: all
+#    vars: 
+#      ram: "64G"
+#      cores: "16"
+#      time_delay: {quantity: 10, units: "minutes"}
+
+# or include statements in a tasks file eg. tasks/main.yml
+#  - include: my_tasks.yml
+   # vars:
+  #   - var1_used_in_my_tasks=val1
+  #   - var2_used_in_my_tasks=val2
+
+# vars can be accessed in tasks by {{vars["var-name"]}}
+
+############# END HEADER FOR VARS ####################
+
+# Directory on the local ansible_controller machine
+logging_home: "/tmp/ansible/log_gathering"
+mail_server: exchange.mycompany.com

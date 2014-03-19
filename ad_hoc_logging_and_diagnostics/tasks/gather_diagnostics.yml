@@ -1,0 +1,141 @@
+---
+
+# logging/tasks/gather_diagnostics.yml
+# Requires:  -e "log_time=<current time approximate> requests_file=<formatted request>" 
+
+# load files from load_folder in format
+# diagnostic_request: {
+#     header: {
+#        issue: "issue_number",
+#      },
+#      requests: [
+#     <hostname1>: {
+#        paths: [ 
+#          /etc/nova/,
+#          /var/log/quantum
+#        ],
+#        commands: [
+#           /etc/init.d/rsyslog,
+#           service quantum-dhcp-agent status
+#        ],
+#        # in addition, scripts in the load_folder can be executed per selected host
+#        scripts: [
+#          script1,
+#          script2
+#        ]
+#    },
+#    <hostname2>: { "..." }
+#
+#    # optionally, specify groups instead of single hosts
+#    <groupname1>: {
+#      paths: [ .. ],
+#      commands: [ .. ]
+#   }, 
+#   ]  # / requests
+#     "groups": [ "group1": ["member1", "member2"],
+#                 "group2": ["member2", "member3"]
+#             ]
+#     # In general we can have
+#     "group_or_host": {"paths": ["path1", "path2"],
+#                       "commands": ["command1", "command2"]
+#                       "script1": ["script1", "script2"]
+#             }
+# } # / diagnostic_request
+# 
+# Return a tarball called diagnostic_<timestamp>.tar.gz
+
+ - include_vars: "../files/{{request_file}}"
+
+# option 1
+# Use ansible to 
+# fetch files with_file_glob (fetch doesn't get folders only files)
+# rsync module would allow grabbing entire folders.
+# local_action: tar -czvf the local folder you fetch things to
+
+ # - name: Add new groups from diagnostic_request
+ #   add_host: name="{{inventory_hostname}}" groups="{{diagnostic_request['groups'][item]}}"
+ #   with_items: "{{diagnostic_request['groups'] | keys}}"
+ #   when: inventory_hostname in {{diagnostic_request['groups']}}
+
+ - name: Clean up _ansible_ad_hoc_logs
+   file: dest="{{_ansible_ad_hoc_logs}}" state=absent
+   
+ - name: Create the logging base dir locally
+   local_action: file state=directory dest="{{logging_home}}/{{log_time}}/{{inventory_hostname}}/{{item}}"
+   with_items:
+     - commands
+     - scripts
+     - logs
+   when: "{{inventory_hostname != 'localhost'}}"
+      
+
+ # - name: Debug Synchronize log files to local _ansible_gather_logs
+ #   debug: msg="src = {{item.1}} dest={{logging_home}}/{{log_time}}/{{inventory_hostname}}"
+ #   when: "{{ inventory_hostname == item.0.hostname or inventory_hostname in groups[item.0.hostname] }}"
+ #   with_subelements: 
+ #     - diagnostic_request.requests
+ #     - paths
+
+ - name: Synchronize log files to local _ansible_gather_logs
+   synchronize: mode=pull 
+                recursive=yes
+                archive=yes
+                dirs=no
+                src="{{item.1}}"
+                dest="{{logging_home}}/{{log_time}}/{{inventory_hostname}}/logs"
+   when: "{{ inventory_hostname == item.0.hostname or inventory_hostname in groups[item.0.hostname] }}"
+   with_subelements: 
+     - diagnostic_request.requests
+     - paths
+
+ - name: Ensure remote tmp directory for scripts and commands exists
+   file: dest="{{_ansible_ad_hoc_logs}}/{{item}}" state=directory
+   with_items:
+     - scripts/results
+     - commands/results
+
+# If shell expansion or quoting gets too difficult, use canned scripts
+ - name: Execute commands and capture stdout
+   shell: "chdir={{_ansible_ad_hoc_logs}} {{item.1}} > commands/results/cmd_{{item.1 | replace(' ','_') | replace('/','_')}}"
+   when: "{{ inventory_hostname == item.0.hostname or inventory_hostname in groups[item.0.hostname] }}"
+   with_subelements: 
+     - diagnostic_request.requests
+     - commands
+
+ - name: Copy scripts to targets
+   copy: src="../scripts/{{item.1}}"
+         dest="{{_ansible_ad_hoc_logs}}"
+         mode=0755
+   when: "{{ inventory_hostname == item.0.hostname or inventory_hostname in groups[item.0.hostname] }}"
+   with_subelements: 
+     - diagnostic_request.requests
+     - scripts
+
+ - name: Execute scripts and capture stdout
+   shell: "chdir={{_ansible_ad_hoc_logs}} ./{{item.1}} > scripts/results/script_{{item.1}}"
+   when: "{{ inventory_hostname == item.0.hostname or inventory_hostname in groups[item.0.hostname] }}"
+   with_subelements: 
+     - diagnostic_request.requests
+     - scripts
+
+ - name: Synchronize log files to local _ansible_gather_logs
+   synchronize: mode=pull 
+                recursive=yes
+                archive=yes
+                dirs=no
+                src="{{_ansible_ad_hoc_logs}}/"
+                dest="{{logging_home}}/{{log_time}}/{{inventory_hostname}}"
+
+ - name: Clean up _ansible_ad_hoc_logs
+   file: dest="{{_ansible_ad_hoc_logs}}" state=absent
+
+
+# option 2
+# Write a bash script that will read the diagnostic_request file
+# and generate a distinct <hostname>.sh for each host.  Then use ansible to 
+# execute the templatized .sh scripts on each host.
+
+# Example .rsync-filter file in the source directory
+# - var       # exclude any path whose last part is 'var'
+# - /var      # exclude any path starting with 'var' starting at the source directory
+# + /var/conf # include /var/conf even though it was previously excluded
