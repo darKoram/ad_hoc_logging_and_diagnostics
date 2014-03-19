@@ -3,6 +3,7 @@ galaxy_info:
   author: Kesten Broughton
   description: A simple formatted file can drive gathering ad hoc lists of logs, execute commands or scripts and collect results from a bunch of hosts.
   company: Kesten
+  documentation_url: https://github.com/darKoram/ad_hoc_logging_and_diagnostics/tree/master/ad_hoc_logging_and_diagnostics
   # Some suggested licenses:
   # - BSD (default)
   # - MIT
@@ -114,7 +115,7 @@ galaxy_info:
   #- packaging
   #- system
   #- web
-dependencies: []
+  dependencies: []
   # List your role dependencies here, one per line. Only
   # dependencies available via galaxy should be listed here.
   # Be sure to remove the '[]' above if you add dependencies
