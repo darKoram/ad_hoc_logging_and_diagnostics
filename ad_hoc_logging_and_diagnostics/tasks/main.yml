@@ -5,8 +5,11 @@
 # Hadoop for logging openstack logs
 # http://www.youtube.com/watch?v=_RKbF67YYE4
 
-# This role will eventuall push and configure all the logging requirements of a deploy
-# It also hosts utilities for one-off and add hock tasks to be used in playbooks for
+# This file provides for one-off and add hock tasks to be used in playbooks for
 # diagnostic gathering and troubleshooting sessions.
 
- - include: zgather_diagnostics.yml
+# tasks files can be easily included into other tasks files or playbooks
+# Here we demonstrate how we can wire up a few specific log-gathering playbooks
+# based on the simple tasks file.
+
+ - include: gather_diagnostics.yml

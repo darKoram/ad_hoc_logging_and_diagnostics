@@ -10,7 +10,7 @@ galaxy_info:
   # - GPLv3
   # - Apache
   # - CC-BY
-  license: license (MIT)
+  license: MIT
   min_ansible_version: 1.0
   #
   # Below are all platforms currently available. Just uncomment
@@ -85,10 +85,10 @@ galaxy_info:
   #  - 11SP1
   #  - 11SP2
   #  - 11SP3
-  - name: GenericLinux
-   versions:
-   - all
-   - any
+    - name: GenericLinux
+      versions:
+       - all
+       - any
   #- name: Debian
   #  versions:
   #  - all

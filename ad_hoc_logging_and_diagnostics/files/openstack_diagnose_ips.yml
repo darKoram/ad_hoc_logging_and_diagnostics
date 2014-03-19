@@ -5,7 +5,8 @@
 # The requests were to gather logs or execute commands or scripts across multiple
 # nodes and gather the results to send to them.
 
-# Note that trailing / on folders is important to rsync.  
+# Note that trailing '/'' on folders is important to rsync.  
+# Including it flattens the files.
 # synchronize src=A/B/ dest=C
 # gives C/all_files_in_B
 # synchronize src=A/B/ dest=C
@@ -22,11 +23,11 @@ diagnostic_request: {
        {
        "hostname": "controller",
         "paths": [
-         /var/log/remote,
          /var/log/nova,
-         /var/log/glance,
+         #/var/log/glance,
          /var/log/keystone,
-         /var/log/keystone-*
+         /var/log/keystone-*.
+         /var/log/glance-*
            ],
        commands: [
          'lsof -n -p $(pid_of_crmd) | wc -l',
@@ -36,6 +37,7 @@ diagnostic_request: {
          test_script2.sh
            ]
        },
+
        {
        "hostname": "compute",
        "paths": [
@@ -49,6 +51,7 @@ diagnostic_request: {
          test_script.sh
            ]
        },
+
        {
        "hostname": "node-8",
        "paths": [
@@ -60,7 +63,22 @@ diagnostic_request: {
        scripts: [
          test_script.sh
            ]
+       },
+              {
+       "hostname": "node-8",
+       "paths": [
+          /var/log/remote,
+           ],
+       commands: [
+         'crm resource status',
+         'quantum agent-list',
+           ],
+       scripts: [
+         test_script.sh
+           ]
        }
+                
+
      ]
 }
 
