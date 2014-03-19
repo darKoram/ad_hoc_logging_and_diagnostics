@@ -1,38 +1,83 @@
 Role Name
 ========
 
-A brief description of the role goes here.
+ad_hoc_logs_and_diagnostics
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+This requires no installations, just bash and probably any shell would work.
+
+Installation
+------------
+
+ansible-galaxy install kesten.ad_hoc_logs_and_diagnostics
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+    logging_home: "/tmp/ansible/log_gathering"
+    mail_server: exchange.mycompany.com
+
+#### load files from load_folder in format
+
+
+    diagnostic_request: 
+         header: 
+            issue: "issue_number",
+            email_from: me@example.com,
+            email: minion1@example.com,boss1@example.com
+          
+         requests:
+            - hostname: host_or_group_1,
+              paths:  
+                - /etc/nova
+                - /var/log/quantum
+              commands: 
+                - /etc/init.d/rsyslog,
+                - service quantum-dhcp-agent status
+            # in addition, scripts in the templates can be executed 
+              scripts:
+                - script1
+                - script2
+
+            - hostname: host_or_group_2,
+              paths: { "..." },
+              commands: { "..."},
+              scripts: { "..."}
+
+Creates a tarball in logging_home called {issue}_{log_time}.tar.gz <br>
+Optionally, attach the tarball to email and send to recipients. <br>
+
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+None
 
 Example Playbook
 -------------------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+A proper example playbook is found in playbooks/gather_diagnostics.yml
+
+ansible-playbook -i hosts gather_logs.yml -e "log_time='current time approximate' requests_file='formatted request'" 
+
+
+Where gather_logs.yml contains
 
     - hosts: servers
       roles:
-         - { role: username.rolename, x: 42 }
+         - { role: kesten.ad_hoc_logs_and_diagnostics, 
+                   log_time: march18, 
+                   send_email: yes,  
+            }
 
 License
 -------
 
-BSD
+MIT
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Kesten Broughton kesten.broughton@gmail.com

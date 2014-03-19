@@ -3,45 +3,6 @@
 # logging/tasks/gather_diagnostics.yml
 # Requires:  -e "log_time=<current time approximate> requests_file=<formatted request>" 
 
-# load files from load_folder in format
-# diagnostic_request: {
-#     header: {
-#        issue: "issue_number",
-#      },
-#      requests: [
-#     <hostname1>: {
-#        paths: [ 
-#          /etc/nova/,
-#          /var/log/quantum
-#        ],
-#        commands: [
-#           /etc/init.d/rsyslog,
-#           service quantum-dhcp-agent status
-#        ],
-#        # in addition, scripts in the load_folder can be executed per selected host
-#        scripts: [
-#          script1,
-#          script2
-#        ]
-#    },
-#    <hostname2>: { "..." }
-#
-#    # optionally, specify groups instead of single hosts
-#    <groupname1>: {
-#      paths: [ .. ],
-#      commands: [ .. ]
-#   }, 
-#   ]  # / requests
-#     "groups": [ "group1": ["member1", "member2"],
-#                 "group2": ["member2", "member3"]
-#             ]
-#     # In general we can have
-#     "group_or_host": {"paths": ["path1", "path2"],
-#                       "commands": ["command1", "command2"]
-#                       "script1": ["script1", "script2"]
-#             }
-# } # / diagnostic_request
-# 
 # Return a tarball called diagnostic_<timestamp>.tar.gz
 
  - include_vars: "../files/{{request_file}}"
