@@ -19,6 +19,10 @@ galaxy_info:
   # platform on this list, let us know and we'll get it added!
   #
   platforms:
+    - name: GenericLinux
+      versions:
+       - all
+       - any
   # - name: EL
   #  versions:
   #  - all
@@ -86,10 +90,7 @@ galaxy_info:
   #  - 11SP1
   #  - 11SP2
   #  - 11SP3
-    - name: GenericLinux
-      versions:
-       - all
-       - any
+
   #- name: Debian
   #  versions:
   #  - all
@@ -101,20 +102,10 @@ galaxy_info:
   # Below are all categories currently available. Just as with
   # the platforms above, uncomment those that apply to your role.
   #
-  #categories:
-  #- cloud
-  #- cloud:ec2
-  #- cloud:gce
-  #- cloud:rax
-  #- database
-  #- database:nosql
-  #- database:sql
+  categories:
   #- development
-  #- monitoring
-  #- networking
-  #- packaging
-  #- system
-  #- web
+   - monitoring
+
   dependencies: []
   # List your role dependencies here, one per line. Only
   # dependencies available via galaxy should be listed here.
