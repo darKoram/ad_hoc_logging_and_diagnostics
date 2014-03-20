@@ -60,7 +60,7 @@ Example Playbook
 
 A proper example playbook is found in playbooks/gather_diagnostics.yml
 
-ansible-playbook -i hosts gather_logs.yml -e "log_time='current time approximate' requests_file='formatted request'" 
+    ansible-playbook -i hosts gather_logs.yml -e "log_time='current time approximate' requests_file='formatted request in files folder'" 
 
 
 Where gather_logs.yml contains
