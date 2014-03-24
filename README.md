@@ -114,7 +114,7 @@ Often the log files will be in the gigabytes.
     add checking that the local disk has space for gathering everything
     add the ability to attach large files via google drive for emailing
 ```
-    <br>
+
 Files are transferred by rsync so they should be compressed, however, they are expanded and then
 compressed again to create a tarball on the ansible_controller
 ```
