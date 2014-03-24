@@ -13,6 +13,16 @@ Installation
 
 ansible-galaxy install kesten.ad_hoc_logs_and_diagnostics
 
+Use Cases
+-----------
+
+There are lots of great log aggregators and visualizers.  However, we often find the need 
+to work with 3rd party contractors where systems are under lock-down.  The primary motivation
+was for receiving ad hoc requests from a party without access to our hosts to gather logs, execute
+commands and run scrips on one several machines.  Often, we would share a tarball of the logs and
+command stdouts.  Some trouble-shooting sessions lasted several hours a day for a week.  More details 
+in files/openstack_diagnose_ips.yml.
+
 Role Variables
 --------------
 
@@ -36,7 +46,8 @@ Role Variables
               commands: 
                 - /etc/init.d/rsyslog,
                 - service quantum-dhcp-agent status
-            # in addition, scripts in the templates can be executed 
+            # in addition, scripts in the role's templates folder can be
+            # executed on the remote hosts and results gathered 
               scripts:
                 - script1
                 - script2
@@ -60,7 +71,9 @@ Example Playbook
 
 A proper example playbook is found in playbooks/gather_diagnostics.yml
 
-    ansible-playbook -i hosts gather_logs.yml -e "log_time='current time approximate' requests_file='formatted request in files folder'" 
+    ansible-playbook -i hosts gather_logs.yml 
+                                 -e "log_time=march18" 
+                                 -e "requests_file='formatted request in files folder'" 
 
 
 Where gather_logs.yml contains
@@ -69,8 +82,7 @@ Where gather_logs.yml contains
       roles:
          - { role: kesten.ad_hoc_logs_and_diagnostics, 
                    log_time: march18, 
-                   send_email: yes,  
-            }
+                   send_email: yes    }
 
 License
 -------
@@ -81,3 +93,25 @@ Author Information
 ------------------
 
 Kesten Broughton kesten.broughton@gmail.com
+
+Bugs
+------------
+
+I expect that the commands will break with any kind of fancy quoting or shell expansion.
+Just put it into a script to workaround that.
+
+TODO
+------------
+
+Often the log files will be in the gigabytes.  
+```
+    add checking that the local disk has space for gathering everything
+    add the ability to attach large files via google drive for emailing
+```
+    <br>
+Files are transferred by rsync so they should be compressed, however, they are expanded and then
+compressed again to create a tarball on the ansible_controller
+```
+     add the ability to stream into a tar archive on the ansible_controller
+     add the option for different compression schemes and encryption
+```
