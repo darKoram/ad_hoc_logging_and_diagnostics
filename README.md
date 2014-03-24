@@ -6,8 +6,13 @@ ad_hoc_logs_and_diagnostics
 Requirements
 ------------
 
-This requires no installations, just bash and probably any shell would work.
-
+This requires no installations, just bash and probably any shell would work.<br><br>
+In the case of clusters only accessible via jump hosts you will need to add ~/.ssh/config similar to that in files/ssh_config.  For example, the private ips of vms in an openstack tenant/project with the cluster on a private network is not accessible directly.  We set up an ansible_controller box on the private network (any cloudpipe or pivot vm would do as well).  The ansible_controller gets a public ip that is directly accessible to admins and all vms in the private network can be accessed via jump host entries in .ssh/config.
+Jump hosts must have netcat (package name nc) installed <br>
+```
+    yum install nc
+    apt-get install nc
+```
 Installation
 ------------
 
@@ -46,7 +51,7 @@ Role Variables
               commands: 
                 - /etc/init.d/rsyslog,
                 - service quantum-dhcp-agent status
-            # in addition, scripts in the role's templates folder can be
+            # in addition, scripts in the role's [templates](github.com/darKoram/ad_hoc_logging_and_diagnostics/tree/master/templates) folder can be
             # executed on the remote hosts and results gathered 
               scripts:
                 - script1
