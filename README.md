@@ -26,7 +26,7 @@ to work with 3rd party contractors where systems are under lock-down.  The prima
 was for receiving ad hoc requests from a party without access to our hosts to gather logs, execute
 commands and run scrips on one several machines.  Often, we would share a tarball of the logs and
 command stdouts.  Some trouble-shooting sessions lasted several hours a day for a week.  More details 
-in [https://github.com/darKoram/ad_hoc_logging_and_diagnostics/tree/master/files/openstack_diagnose_ips.yml](files/openstack_diagnose_ips.yml).
+in [files/openstack_diagnose_ips.yml](https://github.com/darKoram/ad_hoc_logging_and_diagnostics/tree/master/files/openstack_diagnose_ips.yml).
 
 Role Variables
 --------------
