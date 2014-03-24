@@ -1,18 +1,23 @@
 ######### client1 OPENSTACK STAGING VMS ############
 
 
+# Any ssh commands from laptop for hosts matching client1-stag-*
+# will get proxied via the ansible-stag-pivot which has a 
+# floating (public) ip.  nc = netcat.  %h is the matched hostname
+# %p is the specified port (defaults to 22)
+
 Host client1-stag-*
-  ProxyCommand ssh dev1-pivot nc %h %p
+  ProxyCommand ssh ansible-stag-pivot nc %h %p
 
 ######### client1 OPENSTACK STAGING VMS ############
 
-Host client1-prod-elastic01
-  ProxyCommand ssh prod-pivot nc client1-prod-elastic01 22
 
 Host client1-prod-*
   ProxyCommand ssh prod-pivot nc %h %p
 
 ######### OPENSTACK STAGING CONTROLLERS ##########
+# For diagnosing openstack controllers from your laptop
+# by bouncing throught the mirantis fuel controller.
 
 Host node-6
   ProxyCommand ssh fuel2 nc %h %p
