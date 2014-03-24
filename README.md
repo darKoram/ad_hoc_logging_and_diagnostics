@@ -7,7 +7,7 @@ Requirements
 ------------
 
 This requires no installations, just bash and probably any shell would work.<br><br>
-In the case of clusters only accessible via jump hosts you will need to add ~/.ssh/config similar to that in files/ssh_config.  For example, the private ips of vms in an openstack tenant/project with the cluster on a private network is not accessible directly.  We set up an ansible_controller box on the private network (any cloudpipe or pivot vm would do as well).  The ansible_controller gets a public ip that is directly accessible to admins and all vms in the private network can be accessed via jump host entries in .ssh/config.
+In the case of clusters only accessible via jump hosts you will need to add ~/.ssh/config similar to that in [files/ssh_config](github.com/darKoram/ad_hoc_logging_and_diagnostics/tree/master/files/ssh_config).  For example, the private ips of vms in an openstack tenant/project with the cluster on a private network is not accessible directly.  We set up an ansible_controller box on the private network (any cloudpipe or pivot vm would do as well).  The ansible_controller gets a public ip that is directly accessible to admins and all vms in the private network can be accessed via jump host entries in .ssh/config.
 Jump hosts must have netcat (package name nc) installed <br>
 ```
     yum install nc
@@ -26,7 +26,7 @@ to work with 3rd party contractors where systems are under lock-down.  The prima
 was for receiving ad hoc requests from a party without access to our hosts to gather logs, execute
 commands and run scrips on one several machines.  Often, we would share a tarball of the logs and
 command stdouts.  Some trouble-shooting sessions lasted several hours a day for a week.  More details 
-in files/openstack_diagnose_ips.yml.
+in [files/openstack_diagnose_ips.yml](github.com/darKoram/ad_hoc_logging_and_diagnostics/tree/master/files/openstack_diagnose_ips.yml).
 
 Role Variables
 --------------
@@ -49,9 +49,9 @@ Role Variables
                 - /etc/nova
                 - /var/log/quantum
               commands: 
-                - /etc/init.d/rsyslog,
+                - /etc/init.d/rsyslog
                 - service quantum-dhcp-agent status
-            # in addition, scripts in the role's [templates](github.com/darKoram/ad_hoc_logging_and_diagnostics/tree/master/templates) folder can be
+            # in addition, scripts in the role's folder can be
             # executed on the remote hosts and results gathered 
               scripts:
                 - script1
@@ -62,7 +62,8 @@ Role Variables
               commands: { "..."},
               scripts: { "..."}
 
-Creates a tarball in logging_home called {issue}_{log_time}.tar.gz <br>
+Scripts go in [templates](github.com/darKoram/ad_hoc_logging_and_diagnostics/tree/master/templates) 
+When executed it creates a tarball in logging_home called {issue}_{log_time}.tar.gz <br>
 Optionally, attach the tarball to email and send to recipients. <br>
 
 
