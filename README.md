@@ -112,7 +112,7 @@ TODO
 Often the log files will be in the gigabytes.  
 ```
     add checking that the local disk has space for gathering everything
-    add the ability to attach large files via google drive for emailing
+    add the ability to attach large files via google drive or dropbox for emailing
 ```
 
 Files are transferred by rsync so they should be compressed, however, they are expanded and then
@@ -121,3 +121,13 @@ compressed again to create a tarball on the ansible_controller
      add the ability to stream into a tar archive on the ansible_controller
      add the option for different compression schemes and encryption
 ```
+
+Commands are flattened by 
+```
+name: Execute commands and capture stdout
+   shell: "chdir={{_ansible_ad_hoc_logs}} {{item.1}} > commands/results/cmd_{{item.1 | replace(' ','_') | replace('/','_') | replace('|','_pipe_')}}"
+```
+I'm just adding replacements as problems come up.  Should do a robust check for any characters not allowed in filenames and replace them.
+
+Someitmes sensitive data should be removed.  Allow for a grep/sed to redact user specified strings and other obfuscation strategies.
+

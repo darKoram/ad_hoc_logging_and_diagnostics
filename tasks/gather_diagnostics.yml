@@ -57,7 +57,7 @@
 
 # If shell expansion or quoting gets too difficult, use canned scripts
  - name: Execute commands and capture stdout
-   shell: "chdir={{_ansible_ad_hoc_logs}} {{item.1}} > commands/results/cmd_{{item.1 | replace(' ','_') | replace('/','_')}}"
+   shell: "chdir={{_ansible_ad_hoc_logs}} {{item.1}} > commands/results/cmd_{{item.1 | replace(' ','_') | replace('/','_') | replace('|','_pipe_')}}"
    when: "{{ inventory_hostname == item.0.hostname or inventory_hostname in groups[item.0.hostname] }}"
    with_subelements: 
      - diagnostic_request.requests
