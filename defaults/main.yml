@@ -1,2 +1,16 @@
 ---
 # defaults file for dummy
+
+ad_hoc_datadog_issue: id24414
+
+# Directory on the local ansible_controller machine
+ad_hoc_logs_dir: "/tmp/ansible/log_gathering"
+ad_hoc_local_logs_dir: "/tmp/ansible/log_gathering"
+ad_hoc_mail_server: "smtp.gmail.com"
+
+# shouldn't be required but related to ansible issue 6590
+# https://github.com/ansible/ansible/issues/6590
+ad_hoc_rsync_user: ubuntu
+
+ad_hoc_reporter_email: kbroughton@cognitivescale.com
+ad_hoc_support_email: "support+id24414@datadog.zendesk.com"

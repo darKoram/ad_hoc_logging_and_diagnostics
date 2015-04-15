@@ -1,0 +1,26 @@
+# put all scripts in logging/scripts
+diagnostic_request: {
+    header: {
+       issue: "{{ad_hoc_datadog_issue}}",
+       email_from: "{{ad_hoc_reporter_email}}",
+       email: "{{ad_hoc_support_email}}"
+     },
+     requests: [
+       {
+       "hostname": "all",
+        "paths": [
+         /var/log/datadog/supervisord.log,
+         /var/log/datadog/collector.log,
+         /var/log/datadog/dogstatsd.log,
+         /var/log/datadog/forwarder.log,
+         /etc/dd-agent/conf.d/docker.yaml
+           ],
+       commands: [
+         sudo /etc/init.d/datadog-agent info -v,
+         groups dd-agent
+           ],
+       scripts: [
+           ]
+       },
+     ]
+}

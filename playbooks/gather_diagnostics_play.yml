@@ -4,8 +4,7 @@
 # Requires:  -e "log_time=<current time approximate> requests_file=<formatted request>" 
 
  - hosts: localhost
-   vars_files: 
-     - ../vars/main.yml
+   gather_facts: yes
 # Unfortunately, this variable is not available for the whole playbook
 # only this play, and since it is time based, corner cases x:59:59 could 
 # fail.  Instead require log_time to be passed in, whatever format is given works.
@@ -13,32 +12,31 @@
    #   - log_time: "{{ansible_date_time.date}}_{{ansible_date_time.time}}"
    tasks:
      - include_vars: "../files/{{request_file}}"
+     # - set_fact: 
+     #    log_time: "{{ansible_date_time.date}}_{{ansible_date_time.time}}"
 
 
  - hosts: all
-   vars_files: 
-     - ../vars/main.yml
    tasks:
     - include: ../tasks/gather_diagnostics.yml
 
 
  - hosts: localhost
-   vars_files: 
-     - ../vars/main.yml
    tasks:
-     - include_vars: "../files/{{request_file}}"
+     - include_vars: "../defaults/main.yml"
 
      - name: Tar the new diagnostic_request results
-       shell: "tar -cvzf {{logging_home}}/{{diagnostic_request['header']['issue']}}_{{log_time}}.tar.gz {{logging_home}}/{{log_time}}"
+       shell: "tar -cvzf {{ad_hoc_local_logs_dir}}/{{diagnostic_request['header']['issue']}}_{{log_time}}.tar.gz {{ad_hoc_local_logs_dir}}/{{log_time}}"
 
      - name: Mail the tarball to recipients
-       mail: body="tarball of logs for {{diagnostic_request.header.issue}}"
-             from="{{diagnostic_request.header.email_from}}"
-             to="{{diagnostic_request.header.email}}"
-             attach="{{logging_home}}/{{diagnostic_request['header']['issue']}}_{{log_time}}.tar.gz"
-             host="{{mail_server}}
-             port=25
-             subject="enjoy this tarball of logs for {{diagnostic_request.header.issue}}"
+       mail: >
+         body="tarball of logs for {{diagnostic_request.header.issue}}"
+         from="{{diagnostic_request.header.email_from}}"
+         to="{{diagnostic_request.header.email}}"
+         attach="{{ad_hoc_logs_dir}}/{{diagnostic_request['header']['issue']}}_{{log_time}}.tar.gz"
+         host="{{ad_hoc_mail_server}}"
+         port=25
+         subject="enjoy this tarball of logs for {{diagnostic_request.header.issue}}"
          
 # For microsoft exchange server, ansible's mail module required no additional setup to 
 # bounce emails internally via the domain name for the web client.       

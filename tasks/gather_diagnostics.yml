@@ -6,6 +6,7 @@
 # Return a tarball called diagnostic_<timestamp>.tar.gz
 
  - include_vars: "../files/{{request_file}}"
+ - include_vars: "../defaults/main.yml"
 
 # option 1
 # Use ansible to 
@@ -18,11 +19,11 @@
  #   with_items: "{{diagnostic_request['groups'] | keys}}"
  #   when: inventory_hostname in {{diagnostic_request['groups']}}
 
- - name: Clean up _ansible_ad_hoc_logs
-   file: dest="{{_ansible_ad_hoc_logs}}" state=absent
+ - name: Clean up ad_hoc_logs_dir
+   file: dest="{{ad_hoc_logs_dir}}" state=absent
    
  - name: Create the logging base dir locally
-   local_action: file state=directory dest="{{logging_home}}/{{log_time}}/{{inventory_hostname}}/{{item}}"
+   local_action: file state=directory dest="{{ad_hoc_local_logs_dir}}/{{log_time}}/{{inventory_hostname}}/{{item}}"
    with_items:
      - commands
      - scripts
@@ -31,41 +32,44 @@
       
 
  # - name: Debug Synchronize log files to local _ansible_gather_logs
- #   debug: msg="src = {{item.1}} dest={{logging_home}}/{{log_time}}/{{inventory_hostname}}"
+ #   debug: msg="src = {{item.1}} dest={{ad_hoc_local_logs_dir}}/{{log_time}}/{{inventory_hostname}}"
  #   when: "{{ inventory_hostname == item.0.hostname or inventory_hostname in groups[item.0.hostname] }}"
  #   with_subelements: 
  #     - diagnostic_request.requests
  #     - paths
 
- - name: Synchronize log files to local _ansible_gather_logs
+ - name: Synchronize log files to ad_hoc_local_logs_dir
    synchronize: mode=pull 
                 recursive=yes
                 archive=yes
                 dirs=no
                 src="{{item.1}}"
-                dest="{{logging_home}}/{{log_time}}/{{inventory_hostname}}/logs"
+                dest="{{ad_hoc_local_logs_dir}}/{{log_time}}/{{inventory_hostname}}/logs"
    when: "{{ inventory_hostname == item.0.hostname or inventory_hostname in groups[item.0.hostname] }}"
+   sudo_user: "{{ansible_ssh_user}}"
+   remote_user: "{{ad_hoc_rsync_user}}"
    with_subelements: 
      - diagnostic_request.requests
      - paths
 
  - name: Ensure remote tmp directory for scripts and commands exists
-   file: dest="{{_ansible_ad_hoc_logs}}/{{item}}" state=directory
+   file: dest="{{ad_hoc_logs_dir}}/{{item}}" state=directory
    with_items:
      - scripts/results
      - commands/results
 
 # If shell expansion or quoting gets too difficult, use canned scripts
  - name: Execute commands and capture stdout
-   shell: "chdir={{_ansible_ad_hoc_logs}} {{item.1}} > commands/results/cmd_{{item.1 | replace(' ','_') | replace('/','_') | replace('|','_pipe_')}}"
+   shell: "chdir={{ad_hoc_logs_dir}} {{item.1}} > commands/results/cmd_{{item.1 | replace(' ','_') | replace('/','_') | replace('|','_pipe_')}}"
    when: "{{ inventory_hostname == item.0.hostname or inventory_hostname in groups[item.0.hostname] }}"
    with_subelements: 
      - diagnostic_request.requests
      - commands
+   ignore_errors: yes
 
  - name: Copy scripts to targets
    copy: src="../scripts/{{item.1}}"
-         dest="{{_ansible_ad_hoc_logs}}"
+         dest="{{ad_hoc_logs_dir}}"
          mode=0755
    when: "{{ inventory_hostname == item.0.hostname or inventory_hostname in groups[item.0.hostname] }}"
    with_subelements: 
@@ -73,7 +77,7 @@
      - scripts
 
  - name: Execute scripts and capture stdout
-   shell: "chdir={{_ansible_ad_hoc_logs}} ./{{item.1}} > scripts/results/script_{{item.1}}"
+   shell: "chdir={{ad_hoc_logs_dir}} ./{{item.1}} > scripts/results/script_{{item.1}}"
    when: "{{ inventory_hostname == item.0.hostname or inventory_hostname in groups[item.0.hostname] }}"
    with_subelements: 
      - diagnostic_request.requests
@@ -84,11 +88,13 @@
                 recursive=yes
                 archive=yes
                 dirs=no
-                src="{{_ansible_ad_hoc_logs}}/"
-                dest="{{logging_home}}/{{log_time}}/{{inventory_hostname}}"
+                src="{{ad_hoc_logs_dir}}/"
+                dest="{{ad_hoc_local_logs_dir}}/{{log_time}}/{{inventory_hostname}}"
+   sudo_user: "{{ansible_ssh_user}}"
+   remote_user: "{{ad_hoc_rsync_user}}"
 
- - name: Clean up _ansible_ad_hoc_logs
-   file: dest="{{_ansible_ad_hoc_logs}}" state=absent
+ - name: Clean up ad_hoc_logs_dir
+   file: dest="{{ad_hoc_logs_dir}}" state=absent
 
 
 # option 2
