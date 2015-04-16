@@ -96,6 +96,14 @@
  - name: Clean up ad_hoc_logs_dir
    file: dest="{{ad_hoc_logs_dir}}" state=absent
 
+ - name: Tar the new diagnostic_request results
+   local_action: shell tar -cvzf "{{ad_hoc_local_logs_dir}}/{{diagnostic_request['header']['issue']}}_{{log_time}}.tar.gz" "{{ad_hoc_local_logs_dir}}/{{log_time}}"
+   run_once: yes
+
+
+
+# For microsoft exchange server, ansible's mail module required no additional setup to 
+# bounce emails internally via the domain name for the web client.       
 
 # option 2
 # Write a bash script that will read the diagnostic_request file
