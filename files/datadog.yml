@@ -18,6 +18,8 @@ diagnostic_request: {
        commands: [
          sudo /etc/init.d/datadog-agent info -v,
          groups dd-agent
+         docker images -a | wc
+         time docker images -a | tail -n 5
            ],
        scripts: [
            ]
